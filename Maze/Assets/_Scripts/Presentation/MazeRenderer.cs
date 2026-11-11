@@ -18,6 +18,7 @@ namespace MazeGame.Presentation
         [SerializeField] private IMazeService _mazeService;
 
         private List<SpriteRenderer> _activeSprites = new();
+        private MazeData _maze;
 
         /// <summary>
         /// Called by GameController to inject dependencies.
@@ -36,32 +37,28 @@ namespace MazeGame.Presentation
 
             ClearExisting();
 
-            var maze = _mazeService.CurrentMaze;
+            _maze = _mazeService.CurrentMaze;
 
-            for (int x = 0; x < maze.Width; x++)
+            for (int x = 0; x < _maze.Width; x++)
             {
-                for (int y = 0; y < maze.Height; y++)
+                for (int y = 0; y < _maze.Height; y++)
                 {
-                    MazeCell cell = maze.GetCell(x, y);
-
-                    // Only draw if there are walls
-                    if (cell.Walls != 0)
-                    {
-                        SpawnWallSprite(x, y, cell.Walls);
-                    }
+                    SpawnWallSprite(x, y);
                 }
             }
         }
 
-        private void SpawnWallSprite(int x, int y, byte wallMask)
+        private void SpawnWallSprite(int x, int y)
         {
-            if (wallMask < 0 || wallMask >= _wallSprites.Length)
+            MazeCell cell = _maze.GetCell(x, y);
+
+            if (cell.Walls < 0 || cell.Walls >= _wallSprites.Length)
             {
-                Debug.LogError($"Invalid wall mask {wallMask} for cell ({x},{y}). Ensure sprite array is sized correctly.");
+                Debug.LogError($"Invalid wall mask {cell.Walls} for cell ({x},{y}). Ensure sprite array is sized correctly.");
                 return;
             }
 
-            GameObject go = new GameObject($"Wall_{x}_{y}");
+            GameObject go = new GameObject($"Wall_{x}_{y}_{cell.Walls}_{cell.Visited}");
             go.transform.SetParent(transform);
 
             // Calculate world position
@@ -69,7 +66,7 @@ namespace MazeGame.Presentation
             go.transform.position = worldPos;
 
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = _wallSprites[wallMask];
+            sr.sprite = _wallSprites[cell.Walls];
             sr.sharedMaterial = _sharedMaterial; // Critical for batching
             sr.sortingLayerName = "Walls";
             sr.sortingOrder = 0;

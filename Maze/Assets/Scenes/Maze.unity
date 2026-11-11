@@ -197,9 +197,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ada566872c8df4380c213b42d11eed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MazeGame.Presentation.GameController
-  _playerController: {fileID: 0}
-  _mazeRenderer: {fileID: 0}
-  _pathRenderer: {fileID: 0}
+  _playerController: {fileID: 1744673129}
+  _mazeRenderer: {fileID: 831602098}
+  _pathRenderer: {fileID: 5175980}
   _mazeWidth: 10
   _mazeHeight: 10
 --- !u!4 &193355990
@@ -487,10 +487,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cfadbda837fe8e46baf7bd886ce99da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MazeGame.Presentation.MazeRenderer
-  _wallSprites: []
+  _wallSprites:
+  - {fileID: -3218248262026354849, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -1304948482, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: 268228919, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -2083283943, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -584507786, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: 1712108449, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -139193531, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -1629657945, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: 243924347, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -34630367, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -1346233973, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: 20244110, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -1292807127, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: 156265436, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -1991265297, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
+  - {fileID: -500669556, guid: 9c65881ec05881441b247fae5debf9dc, type: 3}
   _cellSize: 1
   _originOffset: {x: 0, y: 0, z: 0}
-  _sharedMaterial: {fileID: 0}
+  _sharedMaterial: {fileID: 2100000, guid: 1893b24a1e26b584693900a7196c82db, type: 2}
 --- !u!4 &831602099
 Transform:
   m_ObjectHideFlags: 0
