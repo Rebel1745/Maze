@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MazeGame.Data;
+using Unity.VisualScripting;
 
 namespace MazeGame.Services
 {
-    /// <summary>
-    /// Handles maze generation and data access.
-    /// Plain C# class - no MonoBehaviour needed unless it needs Update().
-    /// </summary>
     public class MazeService : IMazeService
     {
         public MazeData CurrentMaze { get; private set; }
@@ -24,25 +21,20 @@ namespace MazeGame.Services
             _courseComplete = false;
             _currentX = 0;
             _currentY = 0;
-            MazeCell start = GetCellAt(_currentX, _currentY);
-            start.SetVisited(true);
-            SetCellAt(_currentX, _currentY, start);
 
-            int tries = 0;
-            while (!_courseComplete && tries < 1000000)
+            // set the intital cell as visited
+            GetCellAt(_currentX, _currentY).SetVisited(true);
+
+            while (!_courseComplete)
             {
                 Kill(); // Will run until it hits a dead end.
                 Hunt(); // Finds the next unvisited cell with an adjacent visited cell. If it can't find any, it sets courseComplete to true.
-
-                tries++;
-                if (tries > 999999) UnityEngine.Debug.Log("GenerateNewMaze exceeded the tries limit");
             }
         }
 
         private void Kill()
         {
-            int tries = 0;
-            while (tries < 1000000)
+            while (true)
             {
                 _neighbours.Clear();
 
@@ -54,9 +46,6 @@ namespace MazeGame.Services
                 if (_neighbours.Count == 0) return;
 
                 CarveFromCurrent(_neighbours[UnityEngine.Random.Range(0, _neighbours.Count)]);
-
-                tries++;
-                if (tries > 999999) UnityEngine.Debug.Log("GenerateNewMaze exceeded the tries limit");
             }
         }
 
@@ -75,14 +64,12 @@ namespace MazeGame.Services
             }
 
             current.RemoveWall(dir);
-            SetCellAt(current.X, current.Y, current);
             MazeCell next = GetCellAt(nx, ny);
             next.RemoveWall(WallMask.GetOpposite(dir));
 
             _currentX = nx;
             _currentY = ny;
             next.SetVisited(true); // Mark on ENTRY, not on exit.
-            SetCellAt(next.X, next.Y, next);
         }
 
         private void Hunt()
@@ -99,9 +86,7 @@ namespace MazeGame.Services
                         _currentX = x;
                         _currentY = y;
                         DestroyAdjacentWall(_currentX, _currentY);
-                        MazeCell cell = GetCellAt(_currentX, _currentY);
-                        cell.SetVisited(true);
-                        SetCellAt(_currentX, _currentY, cell);
+                        GetCellAt(_currentX, _currentY).SetVisited(true);
                         return; // Exit the function
                     }
                 }
@@ -158,18 +143,15 @@ namespace MazeGame.Services
             MazeCell next = GetCellAt(nx, ny);
 
             current.RemoveWall(dir);
-            SetCellAt(current.X, current.Y, current);
             next.RemoveWall(WallMask.GetOpposite(dir));
-            SetCellAt(next.X, next.Y, next);
         }
 
         private bool CellIsNotVisited(int x, int y) => CellIsValid(x, y) && !GetCellAt(x, y).Visited;
         private bool CellIsVisited(int x, int y) => CellIsValid(x, y) && GetCellAt(x, y).Visited;
 
-        private bool CellIsValid(int x, int y) => x >= 0 && x < CurrentMaze.Width && y >= 0 && y < CurrentMaze.Height;
+        public bool CellIsValid(int x, int y) => x >= 0 && x < CurrentMaze.Width && y >= 0 && y < CurrentMaze.Height;
 
         public MazeCell GetCellAt(int x, int y) => CurrentMaze.GetCell(x, y);
-        private void SetCellAt(int x, int y, MazeCell cell) => CurrentMaze.SetCell(x, y, cell);
 
         public bool IsWalkable(int x, int y) => true; // Logic depends on rules
     }

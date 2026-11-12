@@ -4,10 +4,6 @@ using System.Diagnostics;
 
 namespace MazeGame.Data
 {
-    /// <summary>
-    /// The logical representation of the entire maze.
-    /// Independent of rendering or physics.
-    /// </summary>
     public class MazeData
     {
         private readonly MazeCell[,] _cells;
@@ -43,14 +39,6 @@ namespace MazeGame.Data
                 throw new System.IndexOutOfRangeException($"Cell ({x},{y}) out of bounds");
 
             return _cells[x, y];
-        }
-
-        public void SetCell(int x, int y, MazeCell cell)
-        {
-            if (x < 0 || x >= Width || y < 0 || y >= Height)
-                throw new System.IndexOutOfRangeException($"Cell ({x},{y}) out of bounds");
-
-            _cells[x, y] = cell;
         }
 
         // Returns valid neighbors based on wall bitmask

@@ -1,9 +1,7 @@
-// Assets/Scripts/Presentation/PathRenderer.cs
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using MazeGame.Services;
 using System.Collections.Generic;
-using System;
 
 namespace MazeGame.Presentation
 {
@@ -21,9 +19,6 @@ namespace MazeGame.Presentation
 
         private List<Vector3Int> _lastRenderedPath = new();
 
-        /// <summary>
-        /// Called by GameController to inject dependencies.
-        /// </summary>
         public void Setup(IPathService pathService)
         {
             _pathService = pathService;

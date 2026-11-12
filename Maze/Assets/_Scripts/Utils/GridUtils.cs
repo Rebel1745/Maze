@@ -5,10 +5,6 @@ namespace MazeGame.Utils
 {
     public static class GridUtils
     {
-        /// <summary>
-        /// Converts world position to grid cell coordinates.
-        /// Assumes standard XY plane grid.
-        /// </summary>
         public static Vector3Int WorldToCell(Vector3 worldPos, float cellSize, Vector3 originOffset = default)
         {
             Vector3 relative = worldPos - originOffset;
@@ -17,9 +13,6 @@ namespace MazeGame.Utils
             return new Vector3Int(x, y, 0);
         }
 
-        /// <summary>
-        /// Converts grid cell coordinates to world center position.
-        /// </summary>
         public static Vector3 CellToWorld(Vector3Int cell, float cellSize, Vector3 originOffset = default)
         {
             return new Vector3(

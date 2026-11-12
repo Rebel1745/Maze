@@ -6,17 +6,17 @@ namespace MazeGame.Presentation
 {
     public class PlayerController : MonoBehaviour
     {
+        [SerializeField] private Sprite _playerSprite;
+        private GameObject _playerGO;
+        private MazeCell _currentCell;
+        private bool _isPlayerActive = false;
+
         private IInputService _inputService;
         private IMazeService _mazeService;
         private IPathService _pathService;
 
-        private Vector3Int _currentCell;
-        private bool _isPlayerActive = false;
 
-        /// <summary>
-        /// Called by GameController to inject dependencies.
-        /// Must be called before any other method on this component.
-        /// </summary>
+
         public void Setup(IInputService inputService, IMazeService mazeService, IPathService pathService)
         {
             _inputService = inputService;
@@ -28,28 +28,22 @@ namespace MazeGame.Presentation
             _inputService.OnConfirm += HandleConfirmInput;
         }
 
-        private void Start()
-        {
-            // Initialize player position (e.g., top-left corner)
-            _currentCell = new Vector3Int(0, 0, 0);
-            _isPlayerActive = true;
-        }
-
         private void HandleMoveInput(Vector2 direction)
         {
             if (!_isPlayerActive || _inputService == null) return;
 
-            Vector3Int targetCell = _currentCell;
+            int targetCellX = _currentCell.X + Mathf.RoundToInt(direction.x);
+            int targetCellY = _currentCell.Y + Mathf.RoundToInt(direction.y);
 
-            // Apply direction to current cell
-            targetCell.x += Mathf.RoundToInt(direction.x);
-            targetCell.y += Mathf.RoundToInt(direction.y);
+            if (!_mazeService.CellIsValid(targetCellX, targetCellY)) return;
+
+            MazeCell targetCell = _mazeService.GetCellAt(targetCellX, targetCellY);
 
             // Validate move against Maze Data
             if (CanMoveTo(targetCell))
             {
-                _currentCell = targetCell;
-                _pathService.ExtendPath(_currentCell);
+                MovePlayer(targetCell);
+                //_pathService.ExtendPath(_currentCell);
 
                 // Optional: Update Player Visual Position here
                 // transform.position = GridUtils.CellToWorld(_currentCell, cellSize);
@@ -61,34 +55,52 @@ namespace MazeGame.Presentation
             if (!_isPlayerActive) return;
 
             // Example: Confirm path or Start a new path
-            _pathService.StartPath(_currentCell);
+            //_pathService.StartPath(new(_currentCell.X, _currentCell.Y, 0));
         }
 
-        private bool CanMoveTo(Vector3Int targetCell)
+        private bool CanMoveTo(MazeCell targetCell)
         {
             if (_mazeService?.CurrentMaze == null) return false;
 
             // Check bounds
-            if (targetCell.x < 0 || targetCell.x >= _mazeService.CurrentMaze.Width ||
-                targetCell.y < 0 || targetCell.y >= _mazeService.CurrentMaze.Height)
+            if (targetCell.X < 0 || targetCell.X >= _mazeService.CurrentMaze.Width ||
+                targetCell.Y < 0 || targetCell.Y >= _mazeService.CurrentMaze.Height)
             {
                 return false;
             }
 
-            // Check walls using bitmask
-            MazeCell currentCell = _mazeService.GetCellAt(_currentCell.x, _currentCell.y);
-
             // Determine which wall is between current and target
-            if (targetCell.x > _currentCell.x)
-                return !currentCell.HasWall(WallMask.East);
-            if (targetCell.x < _currentCell.x)
-                return !currentCell.HasWall(WallMask.West);
-            if (targetCell.y > _currentCell.y)
-                return !currentCell.HasWall(WallMask.North);
-            if (targetCell.y < _currentCell.y)
-                return !currentCell.HasWall(WallMask.South);
+            if (targetCell.X > _currentCell.X)
+                return !_currentCell.HasWall(WallMask.East);
+            if (targetCell.X < _currentCell.X)
+                return !_currentCell.HasWall(WallMask.West);
+            if (targetCell.Y > _currentCell.Y)
+                return !_currentCell.HasWall(WallMask.North);
+            if (targetCell.Y < _currentCell.Y)
+                return !_currentCell.HasWall(WallMask.South);
 
             return false;
+        }
+
+        public void SetupPlayer()
+        {
+            _currentCell = _mazeService.GetCellAt(0, 0);
+            _isPlayerActive = true;
+
+            _playerGO = new GameObject("Player");
+            _playerGO.transform.SetParent(transform);
+            _playerGO.transform.position = _currentCell.Centre;
+
+            SpriteRenderer sr = _playerGO.AddComponent<SpriteRenderer>();
+            sr.sprite = _playerSprite;
+            sr.sortingLayerName = "Player";
+            sr.sortingOrder = 0;
+        }
+
+        private void MovePlayer(MazeCell targetCell)
+        {
+            _currentCell = targetCell;
+            _playerGO.transform.position = targetCell.Centre;
         }
 
         private void OnDestroy()

@@ -58,6 +58,7 @@ namespace MazeGame.Presentation
             _mazeService.GenerateNewMaze(width, height);
             _mazeRenderer.RenderMaze();
             _pathRenderer.Clear();
+            _playerController.SetupPlayer();
             //_pathService.ClearPath();
         }
     }

@@ -1,13 +1,12 @@
+using UnityEngine;
+
 namespace MazeGame.Data
 {
-    /// <summary>
-    /// Represents a single cell in the maze grid.
-    /// Pure data structure - no Unity types.
-    /// </summary>
-    public struct MazeCell
+    public class MazeCell
     {
         public int X;
         public int Y;
+        public Vector3 Centre;
         public byte Walls; // Bitmask of WallMask constants
         public bool Visited;
 

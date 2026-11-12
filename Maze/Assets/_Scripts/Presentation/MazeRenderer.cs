@@ -20,17 +20,15 @@ namespace MazeGame.Presentation
         private List<SpriteRenderer> _activeSprites = new();
         private MazeData _maze;
 
-        /// <summary>
-        /// Called by GameController to inject dependencies.
-        /// </summary>
+        // Camera
+        private Camera _mainCamera;
+
         public void Setup(IMazeService mazeService)
         {
             _mazeService = mazeService;
+            _mainCamera = Camera.main;
         }
 
-        /// <summary>
-        /// Renders the current maze data to the scene.
-        /// </summary>
         public void RenderMaze()
         {
             if (_mazeService == null || _mazeService.CurrentMaze == null) return;
@@ -46,11 +44,14 @@ namespace MazeGame.Presentation
                     SpawnWallSprite(x, y);
                 }
             }
+
+            UpdateCamera();
         }
 
         private void SpawnWallSprite(int x, int y)
         {
             MazeCell cell = _maze.GetCell(x, y);
+            cell.Centre = new(x + (_cellSize * 0.5f), y + (_cellSize * 0.5f), 0f);
 
             if (cell.Walls < 0 || cell.Walls >= _wallSprites.Length)
             {
@@ -58,7 +59,7 @@ namespace MazeGame.Presentation
                 return;
             }
 
-            GameObject go = new GameObject($"Wall_{x}_{y}_{cell.Walls}_{cell.Visited}");
+            GameObject go = new GameObject($"Wall_{x}_{y}");
             go.transform.SetParent(transform);
 
             // Calculate world position
@@ -81,6 +82,15 @@ namespace MazeGame.Presentation
                 if (sr != null) Destroy(sr.gameObject);
             }
             _activeSprites.Clear();
+        }
+
+        private void UpdateCamera()
+        {
+            _mainCamera.transform.position = new Vector3(_maze.Width / 2f, _maze.Height / 2f, _mainCamera.transform.position.z);
+
+            _mainCamera.orthographic = true;
+
+            _mainCamera.orthographicSize = (_maze.Height * 1.1f) / 2f;
         }
 
         private void OnDestroy()

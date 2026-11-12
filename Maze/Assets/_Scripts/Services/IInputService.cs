@@ -3,9 +3,6 @@ using System;
 
 namespace MazeGame.Services
 {
-    /// <summary>
-    /// Abstracts the New Input System into game-specific events.
-    /// </summary>
     public interface IInputService
     {
         // Events
