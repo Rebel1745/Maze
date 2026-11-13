@@ -10,27 +10,33 @@ namespace MazeGame.Presentation
         private GameObject _playerGO;
         private MazeCell _currentCell;
         private bool _isPlayerActive = false;
+        private bool _isPlayerMoving = false;
+        private MazeCell _targetCell;
+        [SerializeField] private float _moveSpeed = 0.1f;
 
-        private IInputService _inputService;
         private IMazeService _mazeService;
         private IPathService _pathService;
 
-
-
-        public void Setup(IInputService inputService, IMazeService mazeService, IPathService pathService)
+        private void Update()
         {
-            _inputService = inputService;
+            if (_isPlayerMoving) MovePlayer();
+        }
+
+        public void Setup(IMazeService mazeService, IPathService pathService)
+        {
             _mazeService = mazeService;
             _pathService = pathService;
 
             // Subscribe to input events after injection
-            _inputService.OnMove += HandleMoveInput;
-            _inputService.OnConfirm += HandleConfirmInput;
+            InputManager.Instance.OnMove += HandleMoveInput;
+            InputManager.Instance.OnConfirm += HandleConfirmInput;
         }
 
         private void HandleMoveInput(Vector2 direction)
         {
-            if (!_isPlayerActive || _inputService == null) return;
+            if (!_isPlayerActive) return;
+            if (direction == Vector2.zero) return;
+            if (_isPlayerMoving) return;
 
             int targetCellX = _currentCell.X + Mathf.RoundToInt(direction.x);
             int targetCellY = _currentCell.Y + Mathf.RoundToInt(direction.y);
@@ -40,22 +46,13 @@ namespace MazeGame.Presentation
             MazeCell targetCell = _mazeService.GetCellAt(targetCellX, targetCellY);
 
             // Validate move against Maze Data
-            if (CanMoveTo(targetCell))
-            {
-                MovePlayer(targetCell);
-                //_pathService.ExtendPath(_currentCell);
-
-                // Optional: Update Player Visual Position here
-                // transform.position = GridUtils.CellToWorld(_currentCell, cellSize);
-            }
+            if (CanMoveTo(targetCell)) StartMovement(targetCell);
         }
 
+        // Currently Unused
         private void HandleConfirmInput()
         {
             if (!_isPlayerActive) return;
-
-            // Example: Confirm path or Start a new path
-            //_pathService.StartPath(new(_currentCell.X, _currentCell.Y, 0));
         }
 
         private bool CanMoveTo(MazeCell targetCell)
@@ -95,22 +92,37 @@ namespace MazeGame.Presentation
             sr.sprite = _playerSprite;
             sr.sortingLayerName = "Player";
             sr.sortingOrder = 0;
+
+            _pathService.ExtendPath(_currentCell);
         }
 
-        private void MovePlayer(MazeCell targetCell)
+        private void StartMovement(MazeCell targetCell)
         {
-            _currentCell = targetCell;
-            _playerGO.transform.position = targetCell.Centre;
+            _isPlayerMoving = true;
+            _targetCell = targetCell;
+            _pathService.UpdatePath(_playerGO.transform.position, true);
+        }
+
+        private void MovePlayer()
+        {
+            _playerGO.transform.position = Vector3.MoveTowards(_playerGO.transform.position, _targetCell.Centre, _moveSpeed);
+            _pathService.UpdatePath(_playerGO.transform.position, false);
+
+            if (Vector3.Distance(_playerGO.transform.position, _targetCell.Centre) < 0.01f) EndPlayerMovement();
+        }
+
+        private void EndPlayerMovement()
+        {
+            _playerGO.transform.position = _targetCell.Centre;
+            _currentCell = _targetCell;
+            _isPlayerMoving = false;
+            _pathService.ExtendPath(_targetCell);
         }
 
         private void OnDestroy()
         {
-            // Unsubscribe to prevent memory leaks
-            if (_inputService != null)
-            {
-                _inputService.OnMove -= HandleMoveInput;
-                _inputService.OnConfirm -= HandleConfirmInput;
-            }
+            InputManager.Instance.OnMove -= HandleMoveInput;
+            InputManager.Instance.OnConfirm -= HandleConfirmInput;
         }
     }
 }

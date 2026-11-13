@@ -10,6 +10,10 @@ namespace MazeGame.Presentation
     {
         [Header("Configuration")]
         [SerializeField] private Sprite[] _wallSprites; // Array indexed by bitmask value (0-15)
+        [SerializeField] private Sprite _startSprite;
+        [SerializeField] private Material _startMaterial;
+        [SerializeField] private Sprite _endSprite;
+        [SerializeField] private Material _endMaterial;
         [SerializeField] private float _cellSize = 1f;
         [SerializeField] private Vector3 _originOffset = new Vector3(0, 0, 0); // To center the maze
         [SerializeField] private Material _sharedMaterial; // For batching
@@ -45,6 +49,8 @@ namespace MazeGame.Presentation
                 }
             }
 
+            SpawnStartAndEndSprites();
+
             UpdateCamera();
         }
 
@@ -75,6 +81,29 @@ namespace MazeGame.Presentation
             _activeSprites.Add(sr);
         }
 
+        private void SpawnStartAndEndSprites()
+        {
+            GameObject startGo = new GameObject("Start");
+            startGo.transform.SetParent(transform);
+            startGo.transform.position = new(0f + _cellSize * 0.5f, 0f + _cellSize * 0.5f, 0f);
+
+            SpriteRenderer sr = startGo.AddComponent<SpriteRenderer>();
+            sr.sprite = _startSprite;
+            sr.sharedMaterial = _startMaterial;
+            sr.sortingLayerName = "StartEnd";
+            _activeSprites.Add(sr);
+
+            GameObject endGo = new GameObject("End");
+            endGo.transform.SetParent(transform);
+            endGo.transform.position = new(_maze.Width - _cellSize * 0.5f, _maze.Height - _cellSize * 0.5f, 0f);
+
+            sr = endGo.AddComponent<SpriteRenderer>();
+            sr.sprite = _endSprite;
+            sr.sharedMaterial = _endMaterial;
+            sr.sortingLayerName = "StartEnd";
+            _activeSprites.Add(sr);
+        }
+
         private void ClearExisting()
         {
             foreach (var sr in _activeSprites)
@@ -90,7 +119,7 @@ namespace MazeGame.Presentation
 
             _mainCamera.orthographic = true;
 
-            _mainCamera.orthographicSize = (_maze.Height * 1.1f) / 2f;
+            _mainCamera.orthographicSize = _maze.Height * 1.1f / 2f;
         }
 
         private void OnDestroy()
