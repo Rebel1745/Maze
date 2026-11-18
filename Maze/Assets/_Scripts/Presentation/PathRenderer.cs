@@ -45,14 +45,6 @@ namespace MazeGame.Presentation
         private void ClearPreviousPath()
         {
             _pathLineRenderer.positionCount = 0;
-            // if (_lastRenderedPath.Count > 0)
-            // {
-            //     foreach (Vector3Int pos in _lastRenderedPath)
-            //     {
-            //         _pathLineRenderer.SetTile(pos, null);
-            //     }
-            //     _lastRenderedPath.Clear();
-            // }
         }
 
         public void Clear()

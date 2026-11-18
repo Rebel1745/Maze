@@ -11,8 +11,7 @@ namespace MazeGame.Services
 
         public void StartPath(MazeCell startCell);
         public void ExtendPath(MazeCell nextCell);
-        public void UpdatePath(Vector3 pos, bool createTemp);
-        public void Backtrack();
+        public void UpdatePath(Vector3 pos, MazeCell finalTarget, bool createTemp);
         public void ClearPath();
         public IReadOnlyList<Vector3> CurrentPath { get; }
     }

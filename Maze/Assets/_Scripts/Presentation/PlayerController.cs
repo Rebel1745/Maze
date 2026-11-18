@@ -100,13 +100,13 @@ namespace MazeGame.Presentation
         {
             _isPlayerMoving = true;
             _targetCell = targetCell;
-            _pathService.UpdatePath(_playerGO.transform.position, true);
+            _pathService.UpdatePath(_playerGO.transform.position, targetCell, true);
         }
 
         private void MovePlayer()
         {
             _playerGO.transform.position = Vector3.MoveTowards(_playerGO.transform.position, _targetCell.Centre, _moveSpeed);
-            _pathService.UpdatePath(_playerGO.transform.position, false);
+            _pathService.UpdatePath(_playerGO.transform.position, _targetCell, false);
 
             if (Vector3.Distance(_playerGO.transform.position, _targetCell.Centre) < 0.01f) EndPlayerMovement();
         }
